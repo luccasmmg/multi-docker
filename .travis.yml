@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t luccasmmg/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run luccasmmg/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t luccasmmg/multi-client ./client
+  - docker build -t luccasmmg/multi-nginx ./nginx
+  - docker build -t luccasmmg/multi-server ./server
+  - docker build -t luccasmmg/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images to docker hub
+  - docker push luccasmmg/multi-client
+  - docker push luccasmmg/multi-nginx
+  - docker push luccasmmg/multi-server
+  - docker push luccasmmg/multi-worker
