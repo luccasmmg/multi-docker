@@ -1,22 +1,30 @@
 sudo: required
 services:
-  - docker
-
+- docker
 before_install:
-  - docker build -t luccasmmg/react-test -f ./client/Dockerfile.dev ./client
-
+- docker build -t luccasmmg/react-test -f ./client/Dockerfile.dev ./client
 script:
-  - docker run -e CI=true luccasmmg/react-test npm test -- --coverage
-
+- docker run -e CI=true luccasmmg/react-test npm test -- --coverage
 after_success:
-  - docker build -t luccasmmg/multi-client ./client
-  - docker build -t luccasmmg/multi-nginx ./nginx
-  - docker build -t luccasmmg/multi-server ./server
-  - docker build -t luccasmmg/multi-worker ./worker
-  # Log in to the docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images to docker hub
-  - docker push luccasmmg/multi-client
-  - docker push luccasmmg/multi-nginx
-  - docker push luccasmmg/multi-server
-  - docker push luccasmmg/multi-worker
+- docker build -t luccasmmg/multi-client ./client
+- docker build -t luccasmmg/multi-nginx ./nginx
+- docker build -t luccasmmg/multi-server ./server
+- docker build -t luccasmmg/multi-worker ./worker
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+- docker push luccasmmg/multi-client
+- docker push luccasmmg/multi-nginx
+- docker push luccasmmg/multi-server
+- docker push luccasmmg/multi-worker
+deploy:
+  provider: elasticbeanstalk
+  region: sa-east-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-sa-east-1-821626484152
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id:
+    secure: a8dD4jOGxvQnr3GhwvcayPidCUAqs+EMdxgKwftCJ2szpEcvJHn1f10q3unT1p1F09MBf5Fz9DGraysuscJ3nLPWAiwyqLXfcS/QHpOnR480UuWunb7Necq/2lH+hNK/1JwVAAtLqrm2LhR+lh+QbJj4eGxtrH4zQ+JASacQUMzOdn8v0eqccetjMZuiotlVWjlGPN1DbIpkVCTpA/01e4l3Zf7CI/tzQ8NYEpJUB4wWTT/kNA0cUCe+K08ippY+q6nnj7TNphyGgxMMDjgPn+ncKOGVU/OV1ea+osBpIEm4pQVMWrW2uCJniLZ9iO19c/hXiUIPdlwrNXhPFuERxZlY1UBB6Sev37hIA27ZUIT49QfMbh7fxKmQwhWvVeuWAQO03quA4jL34WaWFNSSyYLNI+kak8XesfzEpedOoBJJovZ9kB8cPspYbIRF5INKr4bRVEI3H6ndkiieyzPmGTOzeskhm6umKTyVVXoe9S/zS5ENB5zMNieDPocWJ04iGASTlpozf5wQDwLP/Kq4mg0ZyQ34Dk3ApwsHfJHuZH1DcyiZ1SyjdG0ihISQyuC4rxU4RxgodD7zrIHPejKtlAV+fiTjse3oza6eJ6KTd6GVyGHJJ5LMMob5x1XxXy0BgDnWJ2kJ6MB5fDDI4XV3UX6d7o+b7an4ksYz7UN64Yg=
+  secret_access_key:
+    secure: ILE/y/GNqIV+ZEwTlIN18ccVyjjv0mZnaPPqXt8nuKR633TsSkZA3ybBy7jbe3K+6yHwHFeDhMufBXlBVkWrK867TjlzAFt4uXNK7Ej+32GqknNV7LorBV9VgYgvWZHv65fuaHegwchZjDegOq17Lh/FVc6tOY4deG8K06cLhAg05gvsETwFT2aNbQOYY5zj1Q3zZaMWoMJ3KD/5voIUjbOE590qIPOyP1ZvZm0b6PNXx8E8g0ai4e9LGpIVVBMIm1sjKR/8J3BFETB62ytoikEijKhebfkUAt4UQMaxjC+PykvOUfOysmJCoxeVpiUXLqUpbqf51s4Lrjr0jj/sgOu51qyoSwkWvJuT44FhLXwVhOtyMDm0xYnXXEQSCKSWXX9tRolVxVU1cwZ9JSV4qZILKbY0NTadHWvu5ivTgaRnsEcgJxjP6VvqIZT6a6PVHg9ahxJInVX9b7/NmI9Ut5k2EyWoecZ7It+NWI72/YnZ9VpolbLJXuwVaClud2YQ3ananJk5RWwrsqjeanx9eZguoe8JA/0uEop9p7YGJJm7WCaBomS1+R3eZm55DDVOCqdlOMgTRmxakT9CP2mQylNgodCpf80vIaHd2432J2wBNteNJgqhgN31oZ/8D043up88YoeI8t+fVj/TrteLfSYgfLkRBNJ3LveeM2Ca2v4=
