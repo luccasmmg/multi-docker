@@ -16,6 +16,7 @@ after_success:
 - docker push luccasmmg/multi-server
 - docker push luccasmmg/multi-worker
 deploy:
+  edge: true
   provider: elasticbeanstalk
   region: sa-east-1
   app: multi-docker
